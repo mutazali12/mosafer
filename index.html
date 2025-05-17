@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -24,6 +25,17 @@
       display: flex;
       flex-direction: column;
       padding-top: 4rem;
+      overflow-x: hidden;
+    }
+
+    #canvas3d {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      opacity: 0.3;
     }
 
     .header {
@@ -56,36 +68,49 @@
     .sidebar {
       position: fixed;
       top: 0;
-      right: -250px;
-      width: 250px;
-      height: 100%;
+      right: -100%;
+      width: 100%;
+      height: 25%;
       background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(10px);
-      box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
-      padding: 2rem 1rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      padding: 1rem;
       transition: right 0.3s ease;
-      z-index: 999;
+      z-index: 1001;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .sidebar.open {
       right: 0;
     }
 
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+
     .sidebar ul li {
-      margin: 1rem 0;
+      margin: 0.5rem 0;
     }
 
     .sidebar ul li a {
       color: #f1f5f9;
       text-decoration: none;
       font-size: 1rem;
-      display: block;
+      display: flex;
+      align-items: center;
       padding: 0.5rem;
+      border-radius: 0.25rem;
+    }
+
+    .sidebar ul li a i {
+      margin-left: 0.5rem;
     }
 
     .sidebar ul li a:hover {
       background: rgba(255, 255, 255, 0.1);
-      border-radius: 0.25rem;
     }
 
     .banner {
@@ -94,6 +119,8 @@
       background: url('https://via.placeholder.com/1200x200') no-repeat center/cover;
       margin: 0;
       padding: 0;
+      background-color: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
     }
 
     .destinations {
@@ -142,7 +169,7 @@
       width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.5);
-      z-index: 1001;
+      z-index: 1002;
       justify-content: center;
       align-items: center;
     }
@@ -177,8 +204,7 @@
       font-size: 0.9rem;
     }
 
-    .modal-content form input,
-    .modal-content form select {
+    .modal-content form input {
       width: 100%;
       padding: 0.5rem;
       margin-bottom: 1rem;
@@ -230,8 +256,51 @@
       margin-top: auto;
     }
 
-    .footer p {
-      font-size: 0.8rem;
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .social-links a {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      transition: all 0.3s;
+    }
+
+    .social-links a:hover {
+      background: #22c55e;
+      transform: translateY(-5px);
+    }
+
+    .whatsapp-float {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      background: #25D366;
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      transition: transform 0.3s;
+    }
+
+    .whatsapp-float:hover {
+      transform: scale(1.1);
     }
 
     @media (max-width: 576px) {
@@ -245,8 +314,7 @@
       }
 
       .sidebar {
-        width: 200px;
-        right: -200px;
+        height: 25%;
       }
 
       .banner {
@@ -268,10 +336,18 @@
       .modal-content h2 {
         font-size: 1.3rem;
       }
+
+      .whatsapp-float {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+      }
     }
   </style>
 </head>
 <body>
+  <canvas id="canvas3d"></canvas>
+
   <header class="header">
     <div class="logo">
       <img src="https://via.placeholder.com/40" alt="شعار التطبيق" />
@@ -283,8 +359,9 @@
 
   <aside class="sidebar" id="sidebar">
     <ul>
-      <li><a href="#">الرئيسية</a></li>
-      <li><a href="https://wa.me/+249123456789" target="_blank">اتصل بنا</a></li>
+      <li><a href="#"><i class="fas fa-home"></i> الرئيسية</a></li>
+      <li><a href="#" onclick="return false;"><i class="fas fa-bus"></i> توافر الرحلات</a></li>
+      <li><a href="https://mutazali12.github.io/digsplashstart/" target="_blank"><i class="fas fa-info-circle"></i> من نحن</a></li>
     </ul>
   </aside>
 
@@ -293,24 +370,12 @@
     <section class="destinations">
       <h2>وجهاتنا الشعبية</h2>
       <div class="destinations-grid">
-        <div class="destination-card">
-          <h3>القاهرة</h3>
-        </div>
-        <div class="destination-card">
-          <h3>أم درمان</h3>
-        </div>
-        <div class="destination-card">
-          <h3>عطبرة</h3>
-        </div>
-        <div class="destination-card">
-          <h3>بورتسودان</h3>
-        </div>
-        <div class="destination-card">
-          <h3>القضارف</h3>
-        </div>
-        <div class="destination-card">
-          <h3>حلفا القديمة</h3>
-        </div>
+        <div class="destination-card"><h3>القاهرة</h3></div>
+        <div class="destination-card"><h3>أم درمان</h3></div>
+        <div class="destination-card"><h3>عطبرة</h3></div>
+        <div class="destination-card"><h3>بورتسودان</h3></div>
+        <div class="destination-card"><h3>القضارف</h3></div>
+        <div class="destination-card"><h3>حلفا القديمة</h3></div>
       </div>
       <button class="mt-4 bg-green-500 text-navy-900 py-2 px-4 rounded-full font-semibold hover:bg-green-600" onclick="openModal()">احجز الآن</button>
     </section>
@@ -318,33 +383,17 @@
 
   <div class="modal" id="bookingModal">
     <div class="modal-content">
-      <span class="close" onclick="closeModal()">&times;</span>
+      <span class="close" onclick="closeModal()">×</span>
       <h2>حجز تذكرة سفر</h2>
       <form id="bookingForm" action="https://docs.google.com/forms/d/e/1FAIpQLSfjnpWmTmwBQv5YO8Wrn-qQkgbaSyXh7JPdaN9PlRUpvzhpEQ/formResponse" method="POST">
         <label for="name">اسم المستخدم</label>
         <input type="text" id="name" name="entry.178119398" required />
 
         <label for="fromCity">من مدينة</label>
-        <select id="fromCity" name="entry.316922427" required>
-          <option value="" disabled selected>اختر المدينة</option>
-          <option value="القاهرة">القاهرة</option>
-          <option value="أم درمان">أم درمان</option>
-          <option value="عطبرة">عطبرة</option>
-          <option value="بورتسودان">بورتسودان</option>
-          <option value="القضارف">القضارف</option>
-          <option value="حلفا Қديمة">حلفا القديمة</option>
-        </select>
+        <input type="text" id="fromCity" name="entry.316922427" required />
 
         <label for="toCity">إلى مدينة</label>
-        <select id="toCity" name="entry.709628743" required>
-          <option value="" disabled selected>اختر المدينة</option>
-          <option value="القاهرة">القاهرة</option>
-          <option value="أم درمان">أم درمان</option>
-          <option value="عطبرة">عطبرة</option>
-          <option value="بورتسودان">بورتسودان</option>
-          <option value="القضارف">القضارف</option>
-          <option value="حلفا القديمة">حلفا القديمة</option>
-        </select>
+        <input type="text" id="toCity" name="entry.709628743" required />
 
         <label for="tickets">عدد التذاكر</label>
         <input type="number" id="tickets" name="entry.477048095" min="1" max="10" required />
@@ -365,17 +414,55 @@
   </div>
 
   <footer class="footer">
+    <div class="social-links">
+      <a href="https://wa.me/+249912500618" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+      <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+      <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+    </div>
     <p>© 2025 حجز تذاكر السفر. جميع الحقوق محفوظة.</p>
   </footer>
 
+  <a href="https://wa.me/+249912500618" target="_blank" class="whatsapp-float">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+
   <script>
+    // Three.js Background
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75,  window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas3d'), alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const geometry = new THREE.TorusKnotGeometry(10, 3, 100, 16);
+    const material = new THREE.MeshBasicMaterial({ color: 0x3b82f6, wireframe: true });
+    const torusKnot = new THREE.Mesh(geometry, material);
+    scene.add(torusKnot);
+
+    camera.position.z = 30;
+
+    function animate3D() {
+      requestAnimationFrame(animate3D);
+      torusKnot.rotation.x += 0.01;
+      torusKnot.rotation.y += 0.01;
+      renderer.render(scene, camera);
+    }
+    animate3D();
+
+    window.addEventListener('resize', () => {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+    });
+
+    // Sidebar Control
     const sidebar = document.getElementById('sidebar');
     const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
     const modal = document.getElementById('bookingModal');
     const form = document.getElementById('bookingForm');
     const successMessage = document.getElementById('successMessage');
 
-    sidebarToggleBtn.addEventListener('click', () => {
+    sidebarToggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
       sidebar.classList.toggle('open');
       sidebarToggleBtn.innerHTML = sidebar.classList.contains('open')
         ? '<i class="fas fa-times"></i>'
@@ -389,6 +476,7 @@
       }
     });
 
+    // Modal Control
     function openModal() {
       modal.style.display = 'flex';
       form.style.display = 'block';
