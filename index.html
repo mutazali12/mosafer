@@ -224,6 +224,12 @@
       font-family: 'Cairo', sans-serif;
     }
 
+    .modal-content form .submit-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
     .modal-content form button {
       background: #22c55e;
       color: #1e3a8a;
@@ -234,34 +240,37 @@
       font-size: 1rem;
       font-weight: 600;
       transition: background 0.3s ease;
+      position: relative;
     }
 
     .modal-content form button:hover {
       background: #16a34a;
     }
 
-    .modal-content .success-message {
+    .modal-content form .success-message {
       display: none;
-      text-align: center;
-      font-size: 1rem;
-      margin: 1rem 0;
+      color: #22c55e;
+      font-size: 0.9rem;
     }
 
-    .modal-content .success-message p {
-      margin-bottom: 1rem;
+    .modal-content form .spinner {
+      display: none;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #ccc;
+      border-top: 3px solid #22c55e;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
     }
 
-    .modal-content .success-message button {
-      background: #3b82f6;
-    }
-
-    .modal-content .success-message button:hover {
-      background: #2563eb;
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     .footer {
       background: rgba(0, 0, 0, 0.5);
-      color: #f compiling:1f5f9;
+      color: #f1f5f9;
       text-align: center;
       padding: 1rem;
       margin-top: auto;
@@ -338,186 +347,6 @@
       }
 
       .destination-card h3 {
-        font-size: 0.8rem;
-      }
+        font-size: ācija
 
-      .modal-content {
-        padding: 1.5rem;
-      }
-
-      .modal-content h2 {
-        font-size: 1.3rem;
-      }
-
-      .whatsapp-float {
-        width: 50px;
-        height: 50px;
-        font-size: 1.5rem;
-      }
-    }
-  </style>
-</head>
-<body>
-  <canvas id="canvas3d"></canvas>
-
-  <header class="header">
-    <div class="logo">
-      <img src="https://via.placeholder.com/40" alt="شعار التطبيق" />
-    </div>
-    <button class="sidebar-toggle-btn" id="sidebarToggleBtn">
-      <i class="fas fa-bars"></i>
-    </button>
-  </header>
-
-  <aside class="sidebar" id="sidebar">
-    <span class="close-sidebar" onclick="closeSidebar()">×</span>
-    <ul>
-      <li><a href="#">MOSAFER</a></li>
-      <li><a href="#" onclick="return false;"><i class="fas fa-bus"></i> توافر الرحلات</a></li>
-      <li><a href="https://mutazali12.github.io/digsplashstart/" target="_blank"><i class="fas fa-info-circle"></i> من نحن</a></li>
-    </ul>
-  </aside>
-
-  <main>
-    <div class="banner"></div>
-    <section class="destinations">
-      <h2>وجهاتنا الشعبية</h2>
-      <div class="destinations-grid">
-        <div class="destination-card"><h3>القاهرة</h3></div>
-        <div class="destination-card"><h3>أم درمان</h3></div>
-        <div class="destination-card"><h3>عطبرة</h3></div>
-        <div class="destination-card"><h3>بورتسودان</h3></div>
-        <div class="destination-card"><h3>القضارف</h3></div>
-        <div class="destination-card"><h3>حلفا القديمة</h3></div>
-      </div>
-      <button class="mt-4 bg-green-500 text-navy-900 py-2 px-4 rounded-full font-semibold hover:bg-green-600" onclick="openModal()">احجز الآن</button>
-    </section>
-  </main>
-
-  <div class="modal" id="bookingModal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal()">×</span>
-      <h2>حجز تذكرة سفر</h2>
-      <form id="bookingForm" action="https://docs.google.com/forms/d/e/1FAIpQLSfjnpWmTmwBQv5YO8Wrn-qQkgbaSyXh7JPdaN9PlRUpvzhpEQ/formResponse" method="POST">
-        <label for="name">اسم المستخدم</label>
-        <input type="text" id="name" name="entry.178119398" required />
-
-        <label for="fromCity">من مدينة</label>
-        <input type="text" id="fromCity" name="entry.316922427" required />
-
-        <label for="toCity">إلى مدينة</label>
-        <input type="text" id="toCity" name="entry.709628743" required />
-
-        <label for="tickets">عدد التذاكر</label>
-        <input type="number" id="tickets" name="entry.477048095" min="1" max="10" required />
-
-        <label for="date">التاريخ المتوقع للسفر</label>
-        <input type="date" id="date" name="entry.590210591" required />
-
-        <label for="phone">رقم الهاتف (واتساب)</label>
-        <input type="text" id="phone" name="entry.1685038129" required />
-
-        <button type="submit">تأكيد الحجز</button>
-      </form>
-      <div class="success-message" id="successMessage">
-        <p>تم إرسال حجزك بنجاح! سوف يتم التواصل معك عبر واتساب.</p>
-        <button onclick="closeModal()">إغلاق</button>
-      </div>
-    </div>
-  </div>
-
-  <footer class="footer">
-    <div class="social-links">
-      <a href="https://wa.me/+249912500618" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
-      <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-      <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-    </div>
-    <p>© 2025 حجز تذاكر السفر. جميع الحقوق محفوظة.</p>
-  </footer>
-
-  <a href="https://wa.me/+249912500618" target="_blank" class="whatsapp-float">
-    <i class="fab fa-whatsapp"></i>
-  </a>
-
-  <script>
-    // Three.js Background
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas3d'), alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-
-    const geometry = new THREE.TorusKnotGeometry(10, 3, 100, 16);
-    const material = new THREE.MeshBasicMaterial({ color: 0x3b82f6, wireframe: true });
-    const torusKnot = new THREE.Mesh(geometry, material);
-    scene.add(torusKnot);
-
-    camera.position.z = 30;
-
-    function animate3D() {
-      requestAnimationFrame(animate3D);
-      torusKnot.rotation.x += 0.01;
-      torusKnot.rotation.y += 0.01;
-      renderer.render(scene, camera);
-    }
-    animate3D();
-
-    window.addEventListener('resize', () => {
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-    });
-
-    // Sidebar Control
-    const sidebar = document.getElementById('sidebar');
-    const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
-    const modal = document.getElementById('bookingModal');
-    const form = document.getElementById('bookingForm');
-    const successMessage = document.getElementById('successMessage');
-
-    sidebarToggleBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      sidebar.classList.toggle('open');
-      sidebarToggleBtn.innerHTML = sidebar.classList.contains('open')
-        ? '<i class="fas fa-times"></i>'
-        : '<i class="fas fa-bars"></i>';
-    });
-
-    function closeSidebar() {
-      sidebar.classList.remove('open');
-      sidebarToggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
-    }
-
-    document.addEventListener('click', (e) => {
-      if (!sidebar.contains(e.target) && !sidebarToggleBtn.contains(e.target) && sidebar.classList.contains('open')) {
-        closeSidebar();
-      }
-    });
-
-    // Modal Control
-    function openModal() {
-      modal.style.display = 'flex';
-      form.style.display = 'block';
-      successMessage.style.display = 'none';
-    }
-
-    function closeModal() {
-      modal.style.display = 'none';
-      form.reset();
-    }
-
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const formData = new FormData(form);
-      fetch(form.action, {
-        method: 'POST',
-        body: formData,
-      }).then(() => {
-        form.style.display = 'none';
-        successMessage.style.display = 'block';
-      }).catch(() => {
-        alert('حدث خطأ أثناء إرسال الحجز. حاول مرة أخرى.');
-      });
-    });
-  </script>
-</body>
-</html>
+System: * Today's date and time is 10:21 PM EEST on Saturday, May 17, 2025.
