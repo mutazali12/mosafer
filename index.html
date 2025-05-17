@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>حجز تذاكر السفر</title>
+  <meta name="description" content="احجز تذكرتك للسفر بين مصر والسودان بسهولة" />
+  <link rel="icon" href="favicon.ico" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(135deg, #1e3a8a, #4c1d95);
+      color: #f1f5f9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding-top: 4rem;
+    }
+
+    .header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 1rem;
+    }
+
+    .logo img {
+      width: 40px;
+      height: 40px;
+    }
+
+    .sidebar-toggle-btn {
+      background: none;
+      border: none;
+      color: #f1f5f9;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      right: -250px;
+      width: 250px;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+      padding: 2rem 1rem;
+      transition: right 0.3s ease;
+      z-index: 999;
+    }
+
+    .sidebar.open {
+      right: 0;
+    }
+
+    .sidebar ul li {
+      margin: 1rem 0;
+    }
+
+    .sidebar ul li a {
+      color: #f1f5f9;
+      text-decoration: none;
+      font-size: 1rem;
+      display: block;
+      padding: 0.5rem;
+    }
+
+    .sidebar ul li a:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 0.25rem;
+    }
+
+    .banner {
+      width: 100%;
+      height: 200px;
+      background: url('https://via.placeholder.com/1200x200') no-repeat center/cover;
+      margin: 0;
+      padding: 0;
+    }
+
+    .destinations {
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+
+    .destinations h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(to right, #3b82f6, #9333ea);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .destinations-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1rem;
+    }
+
+    .destination-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .destination-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .destination-card h3 {
+      font-size: 0.9rem;
+      color: #22c55e;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1001;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: #fff;
+      color: #1e3a8a;
+      padding: 2rem;
+      border-radius: 0.5rem;
+      width: 90%;
+      max-width: 400px;
+      position: relative;
+      text-align: right;
+    }
+
+    .modal-content h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .modal-content .close {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .modal-content form label {
+      display: block;
+      margin: 0.5rem 0 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    .modal-content form input,
+    .modal-content form select {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 0.25rem;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    .modal-content form button {
+      background: #22c55e;
+      color: #1e3a8a;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: background 0.3s ease;
+    }
+
+    .modal-content form button:hover {
+      background: #16a34a;
+    }
+
+    .modal-content .success-message {
+      display: none;
+      text-align: center;
+      font-size: 1rem;
+      margin: 1rem 0;
+    }
+
+    .modal-content .success-message p {
+      margin-bottom: 1rem;
+    }
+
+    .modal-content .success-message button {
+      background: #3b82f6;
+    }
+
+    .modal-content .success-message button:hover {
+      background: #2563eb;
+    }
+
+    .footer {
+      background: rgba(0, 0, 0, 0.5);
+      color: #f1f5f9;
+      text-align: center;
+      padding: 1rem;
+      margin-top: auto;
+    }
+
+    .footer p {
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 576px) {
+      .header {
+        padding: 0.5rem;
+      }
+
+      .logo img {
+        width: 30px;
+        height: 30px;
+      }
+
+      .sidebar {
+        width: 200px;
+        right: -200px;
+      }
+
+      .banner {
+        height: 150px;
+      }
+
+      .destinations h2 {
+        font-size: 1.3rem;
+      }
+
+      .destination-card h3 {
+        font-size: 0.8rem;
+      }
+
+      .modal-content {
+        padding: 1.5rem;
+      }
+
+      .modal-content h2 {
+        font-size: 1.3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="logo">
+      <img src="https://via.placeholder.com/40" alt="شعار التطبيق" />
+    </div>
+    <button class="sidebar-toggle-btn" id="sidebarToggleBtn">
+      <i class="fas fa-bars"></i>
+    </button>
+  </header>
+
+  <aside class="sidebar" id="sidebar">
+    <ul>
+      <li><a href="#">الرئيسية</a></li>
+      <li><a href="https://wa.me/+249123456789" target="_blank">اتصل بنا</a></li>
+    </ul>
+  </aside>
+
+  <main>
+    <div class="banner"></div>
+    <section class="destinations">
+      <h2>وجهاتنا الشعبية</h2>
+      <div class="destinations-grid">
+        <div class="destination-card">
+          <h3>القاهرة</h3>
+        </div>
+        <div class="destination-card">
+          <h3>أم درمان</h3>
+        </div>
+        <div class="destination-card">
+          <h3>عطبرة</h3>
+        </div>
+        <div class="destination-card">
+          <h3>بورتسودان</h3>
+        </div>
+        <div class="destination-card">
+          <h3>القضارف</h3>
+        </div>
+        <div class="destination-card">
+          <h3>حلفا القديمة</h3>
+        </div>
+      </div>
+      <button class="mt-4 bg-green-500 text-navy-900 py-2 px-4 rounded-full font-semibold hover:bg-green-600" onclick="openModal()">احجز الآن</button>
+    </section>
+  </main>
+
+  <div class="modal" id="bookingModal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2>حجز تذكرة سفر</h2>
+      <form id="bookingForm" action="https://docs.google.com/forms/d/e/1FAIpQLSfjnpWmTmwBQv5YO8Wrn-qQkgbaSyXh7JPdaN9PlRUpvzhpEQ/formResponse" method="POST">
+        <label for="name">اسم المستخدم</label>
+        <input type="text" id="name" name="entry.178119398" required />
+
+        <label for="fromCity">من مدينة</label>
+        <select id="fromCity" name="entry.316922427" required>
+          <option value="" disabled selected>اختر المدينة</option>
+          <option value="القاهرة">القاهرة</option>
+          <option value="أم درمان">أم درمان</option>
+          <option value="عطبرة">عطبرة</option>
+          <option value="بورتسودان">بورتسودان</option>
+          <option value="القضارف">القضارف</option>
+          <option value="حلفا Қديمة">حلفا القديمة</option>
+        </select>
+
+        <label for="toCity">إلى مدينة</label>
+        <select id="toCity" name="entry.709628743" required>
+          <option value="" disabled selected>اختر المدينة</option>
+          <option value="القاهرة">القاهرة</option>
+          <option value="أم درمان">أم درمان</option>
+          <option value="عطبرة">عطبرة</option>
+          <option value="بورتسودان">بورتسودان</option>
+          <option value="القضارف">القضارف</option>
+          <option value="حلفا القديمة">حلفا القديمة</option>
+        </select>
+
+        <label for="tickets">عدد التذاكر</label>
+        <input type="number" id="tickets" name="entry.477048095" min="1" max="10" required />
+
+        <label for="date">التاريخ المتوقع للسفر</label>
+        <input type="date" id="date" name="entry.590210591" required />
+
+        <label for="phone">رقم الهاتف (واتساب)</label>
+        <input type="text" id="phone" name="entry.1685038129" required />
+
+        <button type="submit">تأكيد الحجز</button>
+      </form>
+      <div class="success-message" id="successMessage">
+        <p>تم إرسال حجزك بنجاح! سوف يتم التواصل معك عبر واتساب.</p>
+        <button onclick="closeModal()">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>© 2025 حجز تذاكر السفر. جميع الحقوق محفوظة.</p>
+  </footer>
+
+  <script>
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+    const modal = document.getElementById('bookingModal');
+    const form = document.getElementById('bookingForm');
+    const successMessage = document.getElementById('successMessage');
+
+    sidebarToggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+      sidebarToggleBtn.innerHTML = sidebar.classList.contains('open')
+        ? '<i class="fas fa-times"></i>'
+        : '<i class="fas fa-bars"></i>';
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!sidebar.contains(e.target) && !sidebarToggleBtn.contains(e.target) && sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+        sidebarToggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
+      }
+    });
+
+    function openModal() {
+      modal.style.display = 'flex';
+      form.style.display = 'block';
+      successMessage.style.display = 'none';
+    }
+
+    function closeModal() {
+      modal.style.display = 'none';
+      form.reset();
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      fetch(form.action, {
+        method: 'POST',
+        body: formData,
+      }).then(() => {
+        form.style.display = 'none';
+        successMessage.style.display = 'block';
+      }).catch(() => {
+        alert('حدث خطأ أثناء إرسال الحجز. حاول مرة أخرى.');
+      });
+    });
+  </script>
+</body>
+</html>
