@@ -227,6 +227,10 @@
       font-family: 'Cairo', sans-serif;
     }
 
+    .modal-content form input.error {
+      border-color: #dc2626;
+    }
+
     .modal-content form button {
       background: #22c55e;
       color: #1e3a8a;
@@ -389,7 +393,7 @@
   <aside class="sidebar" id="sidebar">
     <span class="close-sidebar" onclick="closeSidebar()"><i class="fas fa-times"></i></span>
     <ul>
-      <li><a href="#"><i class="fas fa-home"></i> MOSAFER</a></li>
+      <li><a href="#">MOSAFER</a></li>
       <li><a href="#" onclick="return false;"><i class="fas fa-bus"></i> توافر الرحلات</a></li>
       <li><a href="https://mutazali12.github.io/digsplashstart/" target="_blank"><i class="fas fa-info-circle"></i> من نحن</a></li>
     </ul>
@@ -432,7 +436,7 @@
         <input type="date" id="date" name="entry.590210591" required />
 
         <label for="phone">رقم الهاتف (واتساب)</label>
-        <input type="text" id="phone" name="entry.1685038129" required />
+        <input type="text" id="phone" name="entry.1685038129" required pattern="\+[0-9]{10,}" title="يرجى إدخال رقم هاتف دولي صالح (مثل +249912500618)" />
 
         <button type="submit">تأكيد الحجز</button>
       </form>
@@ -441,7 +445,7 @@
         <button onclick="closeModal()">إغلاق</button>
       </div>
       <div class="error-message" id="errorMessage">
-        <p>حدث خطأ أثناء إرسال الحجز. حاول مرة أخرى.</p>
+        <p id="errorText">حدث خطأ أثناء إرسال الحجز. حاول مرة أخرى.</p>
         <button onclick="retryForm()">إعادة المحاولة</button>
       </div>
     </div>
@@ -495,6 +499,7 @@
     const form = document.getElementById('bookingForm');
     const successMessage = document.getElementById('successMessage');
     const errorMessage = document.getElementById('errorMessage');
+    const errorText = document.getElementById('errorText');
 
     sidebarToggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -521,6 +526,8 @@
       form.style.display = 'block';
       successMessage.style.display = 'none';
       errorMessage.style.display = 'none';
+      // Reset input borders
+      document.querySelectorAll('.modal-content form input').forEach(input => input.classList.remove('error'));
     }
 
     function closeModal() {
@@ -529,36 +536,45 @@
       form.style.display = 'block';
       successMessage.style.display = 'none';
       errorMessage.style.display = 'none';
+      // Reset input borders
+      document.querySelectorAll('.modal-content form input').forEach(input => input.classList.remove('error'));
     }
 
     function retryForm() {
       form.style.display = 'block';
       successMessage.style.display = 'none';
       errorMessage.style.display = 'none';
+      // Reset input borders
+      document.querySelectorAll('.modal-content form input').forEach(input => input.classList.remove('error'));
     }
 
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener('submit', (e) => {
       e.preventDefault();
-      const formData = new FormData(form);
+
+      // Client-side validation for phone number
+      const phoneInput = document.getElementById('phone');
+      const phonePattern = /^\+[0-9]{10,}$/;
+      if (!phonePattern.test(phoneInput.value)) {
+        phoneInput.classList.add('error');
+        errorText.textContent = 'يرجى إدخال رقم هاتف دولي صالح (مثل +249912500618)';
+        form.style.display = 'none';
+        successMessage.style.display = 'none';
+        errorMessage.style.display = 'block';
+        return;
+      }
 
       try {
-        const response = await fetch(form.action, {
-          method: 'POST',
-          body: formData,
-          mode: 'cors',
-          headers: {
-            'Accept': 'application/json',
-          },
-        });
-
-        if (response.ok) {
+        // Submit the form natively
+        form.submit();
+        // Immediately show success message based on your confirmation that submission works
+        setTimeout(() => {
           form.style.display = 'none';
           successMessage.style.display = 'block';
           errorMessage.style.display = 'none';
-        } else {
-          throw new Error('Failed to submit form');
-        }
+        }, 500); // Small delay to ensure submission starts
       } catch (error) {
+        console.error('Form submission error:', error);
+        errorText.textContent = `حدث خطأ: ${error.message || 'غير معروف'}. حاول مرة أخرى.`;
         form.style.display = 'none';
         successMessage.style.display = 'none';
         errorMessage.style.display = 'block';
